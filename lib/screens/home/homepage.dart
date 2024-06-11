@@ -29,12 +29,12 @@ class _HomePageState extends State<HomePage> {
     const ProfilePage(),
   ];
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-      setState(() {});
-    });
-  }
+  // void _onItemTapped(int index) {
+  //   setState(() {
+  //     _selectedIndex = index;
+  //     setState(() {});
+  //   });
+  // }
 
   PageController controller = PageController();
 

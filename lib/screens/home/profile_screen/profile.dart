@@ -1,3 +1,4 @@
+import 'package:fancy/screens/home/profile_screen/swipe_to_example.dart';
 import 'package:fancy/screens/login/login.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -40,17 +41,35 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
   Widget build(BuildContext context) {
     return Scaffold(
       // backgroundColor: colorAnimation.value,
-      body: const SafeArea(
+      body: SafeArea(
         child: Center(
           child: Column(
             children: [
-              AnimatedDefaultTextStyle(
-                curve: Curves.bounceIn,
-                style: TextStyle(fontSize: 26,color: Colors.black),
-                duration: Duration(seconds: 1),
-                child: Text('UserName : ',style: TextStyle(color: Colors.brown),),
+              SwipeDetectorExample(
+                onSwipeUp: () {
+                  print("swipe up");
+                },
+                onSwipeDown: () {
+                  print("swipe down");
+                },
+                child: const Padding(
+                  padding: EdgeInsets.only(left: 20, top: 20),
+                  child: CircleAvatar(
+                    backgroundColor: Colors.blue,
+                    radius: 50,
+                    child: Text(
+                      'U',
+                      style:
+                          TextStyle(fontSize: 60, fontWeight: FontWeight.bold, color: Colors.white),
+                    ),
+                  ),
+                ),
               ),
-              Text('Email:'),
+              const Text(
+                'UserName : ',
+                style: TextStyle(color: Colors.brown),
+              ),
+              const Text('Email:'),
             ],
           ),
         ),
