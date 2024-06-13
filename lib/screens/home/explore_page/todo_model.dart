@@ -1,11 +1,24 @@
-
 class ToDoModel {
-  String? description;
-  String? title;
-  int? id;
-  bool? status;
+  final String? description;
+  final String? title;
+  final int? id;
+  final bool? status;
 
-  ToDoModel();
+  const ToDoModel({this.description, this.title, this.id, this.status});
+
+  ToDoModel copyWith({
+    String? description,
+    String? title,
+    int? id,
+    bool? status,
+  }) {
+    return ToDoModel(
+      status: status ?? this.status,
+      description: description ?? this.description,
+      id: id ?? this.id,
+      title: title ?? this.title,
+    );
+  }
 
   ToDoModel.fromJson(Map<String, dynamic> json)
       : id = json['id'],

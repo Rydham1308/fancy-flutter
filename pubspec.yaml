@@ -50,6 +50,8 @@ dependencies:
   firebase_messaging: ^14.7.19
   firebase_in_app_messaging: ^0.7.4+17
   fpdart: ^1.1.0
+  intl:
+  animations: ^2.0.11
 
 dev_dependencies:
   flutter_test:
