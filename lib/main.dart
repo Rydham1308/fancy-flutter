@@ -50,8 +50,6 @@ Future<void> main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-
-
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion(
@@ -67,7 +65,7 @@ class MyApp extends StatelessWidget {
           // primarySwatch: Colors.grey,
           fontFamily: 'Raleway',
         ),
-        initialRoute: '/',
+        initialRoute: '/home',
         routes: {
           '/': (context) => const SplashScreen(),
           '/login': (context) => const LogIn(),

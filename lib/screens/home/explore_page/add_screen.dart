@@ -1,19 +1,33 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fancy/models/todo_model.dart';
-import 'package:flutter/material.dart';
 import 'dart:math';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fancy/screens/home/explore_page/explore_bloc/todo_bloc.dart';
+import 'package:fancy/screens/home/explore_page/todo_model.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 class AddSheet extends StatefulWidget {
-  const AddSheet(
-    this.titleValue,
-    this.descValue,
-    this.editId, {
+  const AddSheet({
+    this.toDoModel,
     super.key,
   });
 
-  final int? editId;
-  final String? titleValue;
-  final String? descValue;
+  static Widget create(ToDoModel? toDoModel) {
+    return MultiRepositoryProvider(
+      providers: [
+        BlocProvider(
+          create: (BuildContext context) {
+            return TodoBloc();
+          },
+        ),
+      ],
+      child: AddSheet(
+        toDoModel: toDoModel,
+      ),
+    );
+  }
+
+  final ToDoModel? toDoModel;
 
   @override
   State<AddSheet> createState() => AddSheetState();
@@ -30,17 +44,16 @@ class AddSheetState extends State<AddSheet> {
   Random random = Random();
   int editId = 0;
   late int editIdIndex;
-  ToDoModel toDoModel = ToDoModel();
+  ToDoModel toDoModel = const ToDoModel();
   ValueNotifier<bool> isRegistered = ValueNotifier(true);
+
   @override
   void didChangeDependencies() {
-    final getOldName = widget.titleValue;
-    final getOldDesc = widget.descValue;
-    final getOldId = widget.editId;
+    final getOldName = widget.toDoModel?.title;
+    final getOldDesc = widget.toDoModel?.description;
     if (getOldName is String) {
       title.text = getOldName;
       desc.text = getOldDesc ?? '';
-      editId = getOldId ?? 0;
       isEditBtn = true;
     }
     super.didChangeDependencies();
@@ -56,8 +69,8 @@ class AddSheetState extends State<AddSheet> {
         }
       },
       child: ClipRRect(
-        borderRadius: const BorderRadius.only(
-            topRight: Radius.circular(30), topLeft: Radius.circular(30)),
+        borderRadius:
+            const BorderRadius.only(topRight: Radius.circular(30), topLeft: Radius.circular(30)),
         child: Container(
           color: const Color(0xFFE3E1D4),
           child: Column(
@@ -65,7 +78,6 @@ class AddSheetState extends State<AddSheet> {
             mainAxisAlignment: MainAxisAlignment.end,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-
               Container(
                 margin: const EdgeInsets.only(left: 23, bottom: 15, top: 20),
                 alignment: Alignment.centerLeft,
@@ -73,16 +85,12 @@ class AddSheetState extends State<AddSheet> {
                     ? const Text(
                         "Add Note",
                         style: TextStyle(
-                            fontSize: 30,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black),
+                            fontSize: 30, fontWeight: FontWeight.w600, color: Colors.black),
                       )
                     : const Text(
                         "Update Note",
                         style: TextStyle(
-                            fontSize: 30,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black),
+                            fontSize: 30, fontWeight: FontWeight.w600, color: Colors.black),
                       ),
               ),
               Form(
@@ -90,8 +98,7 @@ class AddSheetState extends State<AddSheet> {
                 child: Column(
                   children: [
                     Container(
-                      margin: const EdgeInsets.only(
-                          right: 23, left: 23, bottom: 10),
+                      margin: const EdgeInsets.only(right: 23, left: 23, bottom: 10),
                       child: TextField(
                         controller: title,
                         cursorColor: Colors.black,
@@ -114,8 +121,7 @@ class AddSheetState extends State<AddSheet> {
                       ),
                     ),
                     Container(
-                      margin: const EdgeInsets.only(
-                          right: 23, left: 23, bottom: 20),
+                      margin: const EdgeInsets.only(right: 23, left: 23, bottom: 20),
                       child: TextField(
                         maxLines: 6,
                         controller: desc,
@@ -147,36 +153,35 @@ class AddSheetState extends State<AddSheet> {
                 alignment: Alignment.centerLeft,
                 child: ElevatedButton(
                   onPressed: () async {
-                    try{
-                    if (isEditBtn) {
-                      toDoModel.title = title.text.trim();
-                      toDoModel.description = desc.text.trim();
-                      toDoModel.status = false;
-                      toDoModel.id = editId;
-                      await editData();
-                    } else {
-                      toDoModel.title = title.text.trim();
-                      toDoModel.description = desc.text.trim();
-                      toDoModel.status = false;
-                      toDoModel.id = random.nextInt(1000000);
-                      await dataAdd();
-                    }
-                    Future.delayed(Duration.zero)
-                        .then((value) => Navigator.pop(context, true));
-                  }on FirebaseException catch(e){
-                      Future.delayed(Duration.zero).then((value) =>
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              backgroundColor: const Color(0xd52d2d2d),
-                              content: Text(
-                                e.message.toString(),
-                                style:
-                                const TextStyle(color: Colors.white),
-                              ),
-                              duration:
-                              const Duration(milliseconds: 1000),
-                            ),
-                          ));
+                    try {
+                      if (isEditBtn) {
+                        await editData(widget.toDoModel?.copyWith(
+                              title: title.text.trim(),
+                              status: false,
+                              description: desc.text.trim(),
+                            ) ??
+                            const ToDoModel());
+                      } else {
+                        await dataAdd(toDoModel.copyWith(
+                          title: title.text.trim(),
+                          status: false,
+                          description: desc.text.trim(),
+                          id: random.nextInt(1000000),
+                        ));
+                      }
+                      Future.delayed(Duration.zero).then((value) => Navigator.pop(context, true));
+                    } on FirebaseException catch (e) {
+                      Future.delayed(Duration.zero)
+                          .then((value) => ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  backgroundColor: const Color(0xd52d2d2d),
+                                  content: Text(
+                                    e.message.toString(),
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                  duration: const Duration(milliseconds: 1000),
+                                ),
+                              ));
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -210,13 +215,11 @@ class AddSheetState extends State<AddSheet> {
     );
   }
 
-  Future<void> editData() async {
-    final db = FirebaseFirestore.instance;
-    db.collection('todo').doc('${toDoModel.id}').update(toDoModel.toJson());
+  Future<void> editData(ToDoModel todoModel) async {
+    context.read<TodoBloc>().add(EditTodoEvent(toDoModel: todoModel));
   }
 
-  Future<void> dataAdd() async {
-    final db = FirebaseFirestore.instance;
-    db.collection('todo').doc('${toDoModel.id}').set(toDoModel.toJson());
+  Future<void> dataAdd(ToDoModel todoModel) async {
+    context.read<TodoBloc>().add(AddTodoEvent(toDoModel: todoModel));
   }
 }

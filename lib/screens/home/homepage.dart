@@ -1,7 +1,10 @@
 import 'dart:ui';
+
 import 'package:fancy/screens/home/postoffice_screen/post_office_screen.dart';
 import 'package:fancy/screens/home/profile_screen/profile.dart';
+import 'package:fancy/screens/home/profile_screen/profile_page.dart';
 import 'package:fancy/screens/home/shop_page/shoppage.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -17,6 +20,9 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   @override
   void initState() {
+    if (FirebaseAuth.instance.currentUser != null) {
+      print(FirebaseAuth.instance.currentUser?.uid);
+    }
     super.initState();
   }
 
@@ -24,17 +30,10 @@ class _HomePageState extends State<HomePage> {
 
   static final List<Widget> _widgetOptions = <Widget>[
     const ShopPage(),
-    const ExploreList(),
+    ExploreList.create(),
     PostOfficeSearch.create(),
     const ProfilePage(),
   ];
-
-  // void _onItemTapped(int index) {
-  //   setState(() {
-  //     _selectedIndex = index;
-  //     setState(() {});
-  //   });
-  // }
 
   PageController controller = PageController();
 
@@ -57,6 +56,7 @@ class _HomePageState extends State<HomePage> {
         automaticallyImplyLeading: false,
         backgroundColor: Colors.black.withAlpha(0),
         elevation: 1,
+        leading: const Padding(padding: EdgeInsets.only(left: 15), child: DraggableExample()),
         actions: [
           GestureDetector(
             onTap: () {},
